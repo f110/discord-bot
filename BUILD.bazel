@@ -1,0 +1,55 @@
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+# gazelle:prefix github.com/f110/discord-bot
+gazelle(name = "gazelle")
+
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
+
+pkg_tar(
+    name = "bin",
+    srcs = [
+        "//cmd/discord-bot",
+    ],
+    mode = "0755",
+    package_dir = "/usr/local/bin",
+)
+
+container_image(
+    name = "image",
+    base = "@com_google_distroless_base//image",
+    entrypoint = ["/usr/local/bin/discord-bot"],
+    tars = [":bin"],
+)
+
+container_push(
+    name = "push",
+    format = "Docker",
+    image = ":image",
+    registry = "docker.pkg.github.com",
+    repository = "f110/discord-bot/bot",
+    tag = "latest",
+)
+
+pkg_tar(
+    name = "proxy_bin",
+    srcs = ["//cmd/object-proxy"],
+    mode = "0755",
+    package_dir = "/usr/local/bin",
+)
+
+container_image(
+    name = "proxy_image",
+    base = "@com_google_distroless_base//image",
+    entrypoint = ["/usr/local/bin/object-proxy"],
+    tars = [":proxy_bin"],
+)
+
+container_push(
+    name = "proxy_push",
+    format = "Docker",
+    image = ":image",
+    registry = "docker.pkg.github.com",
+    repository = "f110/discord-bot/object-proxy",
+    tag = "latest",
+)
