@@ -26,8 +26,8 @@ container_push(
     name = "push",
     format = "Docker",
     image = ":image",
-    registry = "docker.pkg.github.com",
-    repository = "f110/discord-bot/bot",
+    registry = "registry.f110.dev",
+    repository = "discord-bot/bot",
     tag = "latest",
 )
 
@@ -49,7 +49,7 @@ container_push(
     name = "proxy_push",
     format = "Docker",
     image = ":image",
-    registry = "docker.pkg.github.com",
-    repository = "f110/discord-bot/object-proxy",
+    registry = "registry.f110.dev",
+    repository = "discord-bot/object-proxy",
     tag = "latest",
 )
