@@ -1,5 +1,6 @@
 branch: master
 target: //:push
+docker_config_secret_name: docker-config-discord-bot
 artifacts:
   - bazel-bin/push.digest
 post_process:
