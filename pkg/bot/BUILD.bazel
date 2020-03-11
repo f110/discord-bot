@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["bot.go"],
+    importpath = "github.com/f110/discord-bot/pkg/bot",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/amesh:go_default_library",
+        "//pkg/command:go_default_library",
+        "//pkg/config:go_default_library",
+        "//pkg/handler:go_default_library",
+        "//pkg/storage:go_default_library",
+        "@com_github_bwmarrin_discordgo//:go_default_library",
+    ],
+)

@@ -8,18 +8,22 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/f110/discord-bot/pkg/handler"
 	"github.com/spf13/pflag"
+
+	"github.com/f110/discord-bot/pkg/bot"
+	"github.com/f110/discord-bot/pkg/config"
 )
 
 var shutdownSem = make(chan struct{}, 1)
 
 func process(args []string) error {
 	name := ""
+	confPath := ""
 	storageHost := ""
 	bucket := ""
 	bucketHost := ""
 	fs := pflag.NewFlagSet("discord-bot", pflag.ContinueOnError)
+	fs.StringVarP(&confPath, "conf", "c", confPath, "Config file path")
 	fs.StringVarP(&name, "name", "n", name, "Bot name")
 	fs.StringVar(&storageHost, "storage", storageHost, "Storage endpoint")
 	fs.StringVar(&bucket, "bucket", bucket, "Bucket name")
@@ -28,15 +32,28 @@ func process(args []string) error {
 		return err
 	}
 
+	if _, err := os.Stat(confPath); os.IsNotExist(err) {
+		return errors.New("config file does not found")
+	}
+
+	conf, err := config.ReadConfig(confPath)
+	if err != nil {
+		return err
+	}
+	conf.Bucket = bucket
+	conf.StorageHost = storageHost
+	conf.BucketHost = bucketHost
+
 	token := os.Getenv("BOT_TOKEN")
 	if token == "" {
 		return errors.New("bot token is required")
 	}
 
-	b, err := handler.New(name, token, storageHost, bucket, bucketHost)
+	b, err := bot.NewBot(name, token, storageHost, bucket, bucketHost, conf)
 	if err != nil {
 		return err
 	}
+
 	if err := b.Run(); err != nil {
 		return err
 	}
@@ -57,7 +74,7 @@ func process(args []string) error {
 	return nil
 }
 
-func shutdown(p *handler.Bot) {
+func shutdown(p *bot.Bot) {
 	shutdownSem <- struct{}{}
 	defer func() {
 		<-shutdownSem
