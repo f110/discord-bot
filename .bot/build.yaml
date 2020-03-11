@@ -1,0 +1,9 @@
+branch: master
+target: //:push
+artifacts:
+  - bazel-bin/push.digest
+post_process:
+  repo: github.com/f110/ops
+  image: registry.f110.dev/discord-bot/bot
+  paths:
+    - clusters/globemaster/bot/discord-bot/kustomization.yaml
