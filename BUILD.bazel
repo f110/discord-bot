@@ -30,26 +30,3 @@ container_push(
     repository = "discord-bot/bot",
     tag = "latest",
 )
-
-pkg_tar(
-    name = "proxy_bin",
-    srcs = ["//cmd/object-proxy"],
-    mode = "0755",
-    package_dir = "/usr/local/bin",
-)
-
-container_image(
-    name = "proxy_image",
-    base = "@com_google_distroless_base//image",
-    entrypoint = ["/usr/local/bin/object-proxy"],
-    tars = [":proxy_bin"],
-)
-
-container_push(
-    name = "proxy_push",
-    format = "Docker",
-    image = ":image",
-    registry = "registry.f110.dev",
-    repository = "discord-bot/object-proxy",
-    tag = "latest",
-)
