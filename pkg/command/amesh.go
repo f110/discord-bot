@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/bwmarrin/discordgo"
 
@@ -52,7 +53,9 @@ func (a *Amesh) Execute(s *discordgo.Session, e *discordgo.MessageCreate) {
 		log.Print("Call amesh plugin but amesh plugin is not enabled.")
 		return
 	}
-	if e.Content != "amesh" {
+	c := strings.Split(e.Content, " ")
+	if len(c) < 2 || c[1] != "amesh" {
+		log.Printf("Unknown command: %s", e.Content)
 		return
 	}
 
