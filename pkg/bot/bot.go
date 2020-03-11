@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"log"
 	"sync"
 
 	"github.com/bwmarrin/discordgo"
@@ -22,6 +23,7 @@ type Bot struct {
 	doneCh    chan struct{}
 	closeOnce sync.Once
 	handler   *handler.Handler
+	conf      *config.Config
 
 	amesh   *amesh.Generator
 	storage *storage.Storage
@@ -42,10 +44,12 @@ func NewBot(name, token string, storageHost, bucket, bucketHost string, conf *co
 		client:      dg,
 		doneCh:      make(chan struct{}),
 		handler:     handler.New(name),
+		conf:        conf,
 	}
 	dg.AddHandler(b.handler.ReceiveEvent)
 
 	for _, p := range conf.EnablePlugins {
+		log.Printf("Enabling %s", p)
 		b.LoadPlugin(p)
 	}
 
@@ -55,9 +59,14 @@ func NewBot(name, token string, storageHost, bucket, bucketHost string, conf *co
 func (b *Bot) LoadPlugin(name string) {
 	p, ok := command.Manager.Fetch(name)
 	if !ok {
+		log.Printf("Plugin %s is not found", name)
 		return
 	}
 
+	if err := p.Enable(b.conf); err != nil {
+		log.Printf("Failed enabling %s: %v", name, err)
+		return
+	}
 	p.Subscribe(b.handler)
 }
 
