@@ -4,7 +4,7 @@ docker_config_secret_name: docker-config-discord-bot
 artifacts:
   - bazel-bin/push.digest
 post_process:
-  repo: github.com/f110/ops
+  repo: f110/ops
   image: registry.f110.dev/discord-bot/bot
   paths:
     - clusters/globemaster/bot/discord-bot/kustomization.yaml
